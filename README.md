@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PawPass
 
-## Getting Started
+Aplicación Next.js App Router para registro de mascotas. Parte del workspace `PawPass + Cloud Run Doctor`. Esta fundación instala la base visual cálida y los gates de calidad sin implementar lógica de negocio.
 
-First, run the development server:
+## Requisitos
+
+- Node.js `20.19.x LTS` (compatible con 22) — `node --version`
+- pnpm `11.9.0` — `pnpm --version` (pin en `packageManager`)
+- Git
+
+## Instalación
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install --frozen-lockfile
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No modifica `pnpm-lock.yaml`. Si falla por lock desactualizado, actualizar dependencias y commitear nuevo lock solo si se añadió dep justificada.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Comando | Descripción |
+|--------|---------|-------------|
+| `dev` | `next dev` | Desarrollo |
+| `build` | `next build` | Build producción |
+| `start` | `next start` | Servir build |
+| `lint` | `eslint .` | ESLint flat config |
+| `typecheck` | `tsc --noEmit` | Tipos |
+| `test` | `vitest` | Watch |
+| `test:unit` | `vitest run` | Unitario |
+| `test:coverage` | `vitest run --coverage` | Cobertura V8 80% |
+| `verify` | `pnpm typecheck && pnpm test:coverage` | Gate Husky/CI |
+| `prepare` | `node .husky/install.mjs` | Instala hooks Husky |
 
-## Learn More
+## Estructura
 
-To learn more about Next.js, take a look at the following resources:
+```
+pawpass/
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx (SiteHeader + PawpassHero + StatusCard)
+│   │   └── globals.css (tokens HSL cálidos, strategy hsl(var(--)))
+│   ├── components/
+│   │   ├── ui/ (button, card, badge, alert, skeleton, input, label — 7)
+│   │   ├── site-header.tsx, pawpass-hero.tsx, status-card.tsx
+│   │   └── *.test.tsx
+│   └── lib/
+│       ├── utils.ts (cn)
+│       └── format.ts
+├── docs/
+│   └── 01-visual-decisions.md
+├── .husky/
+├── components.json (style default, baseColor stone, shadcn@3.4.1)
+├── vitest.config.mts / vitest.setup.ts
+└── .env.example
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentación
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `docs/01-visual-decisions.md` — paleta cálida, tokens HSL y uso de primitives
+- `specs/001-project-foundation/` — spec, plan, research, quickstart y tasks de la fundación
 
-## Deploy on Vercel
+## Verificación
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm typecheck
+pnpm test:coverage  # V8, 80/80/80/80, offline
+pnpm verify
+pnpm build
+ls src/components/ui | wc -l  # 7
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Fundación sin Neon, Drizzle, laboratorio de incidentes ni logs de negocio.
