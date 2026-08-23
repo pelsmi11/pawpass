@@ -6,11 +6,11 @@ vi.mock("@/db/queries", () => ({
   listRecentPets: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/services/session", () => ({
   getOrCreateSessionId: vi.fn().mockResolvedValue("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"),
 }));
 
-vi.mock("@/lib/request-context", () => ({
+vi.mock("@/utils/functions", () => ({
   createRequestId: vi.fn().mockReturnValue("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
 }));
 
@@ -35,7 +35,7 @@ describe("POST /api/pets - validation errors", () => {
     const json = await res.json();
     expect(res.status).toBe(400);
     expect(json.ok).toBe(false);
-    expect(json.fieldErrors.name).toBeDefined();
+    expect(json.fieldErrorCodes.name).toBeDefined();
     expect(json.supportId).toBeDefined();
     expect(JSON.stringify(json)).not.toContain("23503");
     expect(createPet).not.toHaveBeenCalled();
@@ -50,7 +50,7 @@ describe("POST /api/pets - validation errors", () => {
     const res = await POST(req);
     const json = await res.json();
     expect(res.status).toBe(400);
-    expect(json.fieldErrors.ownerName).toBeDefined();
+    expect(json.fieldErrorCodes.ownerName).toBeDefined();
     expect(createPet).not.toHaveBeenCalled();
   });
 
@@ -64,7 +64,7 @@ describe("POST /api/pets - validation errors", () => {
       const res = await POST(req);
       const json = await res.json();
       expect(res.status).toBe(400);
-      expect(json.fieldErrors.age).toBeDefined();
+      expect(json.fieldErrorCodes.age).toBeDefined();
     }
     expect(createPet).not.toHaveBeenCalled();
   });
@@ -78,7 +78,7 @@ describe("POST /api/pets - validation errors", () => {
     const res = await POST(req);
     const json = await res.json();
     expect(res.status).toBe(400);
-    expect(json.fieldErrors.age).toBeDefined();
+    expect(json.fieldErrorCodes.age).toBeDefined();
   });
 
   it("returns 400 for unknown petTypeId", async () => {
@@ -91,7 +91,7 @@ describe("POST /api/pets - validation errors", () => {
     const res = await POST(req);
     const json = await res.json();
     expect(res.status).toBe(400);
-    expect(json.fieldErrors.petTypeId).toBeDefined();
+    expect(json.fieldErrorCodes.petTypeId).toBeDefined();
     expect(JSON.stringify(json)).not.toContain("FOREIGN");
     expect(createPet).not.toHaveBeenCalled();
   });
@@ -119,7 +119,7 @@ describe("POST /api/pets - validation errors", () => {
     const res = await POST(req);
     const json = await res.json();
     expect(res.status).toBe(400);
-    expect(json.fieldErrors.name).toBeDefined();
+    expect(json.fieldErrorCodes.name).toBeDefined();
   });
 
   it("accepts name 100 chars", async () => {
@@ -150,11 +150,11 @@ describe("POST /api/pets - validation errors", () => {
     const res = await POST(req);
     const json = await res.json();
     expect(res.status).toBe(400);
-    expect(json.fieldErrors.sessionId).toBeDefined();
+    expect(json.fieldErrorCodes.sessionId).toBeDefined();
     expect(createPet).not.toHaveBeenCalled();
   });
 
-  it("Spanish messages and no PG leak", async () => {
+  it("returns stable codes and no PG leak", async () => {
     const req = new Request("http://localhost/api/pets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -162,7 +162,8 @@ describe("POST /api/pets - validation errors", () => {
     });
     const res = await POST(req);
     const json = await res.json();
-    expect(json.message).toMatch(/Revisa/);
+    expect(json.errorCode).toBe("VALIDATION_FAILED");
+    expect(json).not.toHaveProperty("message");
     expect(JSON.stringify(json)).not.toMatch(/23503|FOREIGN|pg|postgres/i);
   });
 });

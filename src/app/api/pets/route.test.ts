@@ -6,11 +6,11 @@ vi.mock("@/db/queries", () => ({
   createPet: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/services/session", () => ({
   getOrCreateSessionId: vi.fn().mockResolvedValue("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"),
 }));
 
-vi.mock("@/lib/request-context", () => ({
+vi.mock("@/utils/functions", () => ({
   createRequestId: vi.fn().mockReturnValue("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
 }));
 
@@ -94,7 +94,8 @@ describe("POST /api/pets - valid creation", () => {
 
     expect(res.status).toBe(400);
     expect(json.ok).toBe(false);
-    expect(json.fieldErrors.sessionId).toBe("No permitido.");
+    expect(json.errorCode).toBe("VALIDATION_FAILED");
+    expect(json.fieldErrorCodes.sessionId).toBe("SESSION_FIELD_FORBIDDEN");
     expect(json.supportId).toBeDefined();
     expect(createPet).not.toHaveBeenCalled();
   });
@@ -106,7 +107,6 @@ describe("POST /api/pets - valid creation", () => {
       body: JSON.stringify({ name: "Luna", petTypeId: dogId, ownerName: "Ana", session_id: "evil" }),
     });
     const res = await POST(req);
-    const json = await res.json();
     expect(res.status).toBe(400);
     expect(createPet).not.toHaveBeenCalled();
   });

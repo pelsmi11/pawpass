@@ -73,9 +73,9 @@ Regla: **los tokens medios (ámbar/naranja) llevan tinta oscura encima; los oscu
 
 ## Componentes de página
 
-- **site-header**: sticky con blur (`bg-background/80 backdrop-blur`), logo mark PawPrint en tile primario, nav (Pets/Health/Reminders), CTA `size="sm"`, skip-to-content
-- **pawpass-hero**: grid `lg:[1.1fr_0.9fr]`; mensaje + CTAs + trust points (iconos lucide) junto a tarjeta perfil de mascota (avatar, badge Healthy, dl de stats, next checkup)
-- **status-card**: búsqueda habilitada arriba, lista de mascotas con badges semánticos (texto, nunca solo color), alert warning contextual, footer global discreto
+- **SiteHeader**: sticky con blur (`bg-background/80 backdrop-blur`), logo mark PawPrint en tile primario, nav (Pets/Health/Reminders), CTA `size="sm"`, skip-to-content
+- **PawpassHero**: grid `lg:[1.1fr_0.9fr]`; mensaje + CTAs + trust points (iconos lucide) junto a tarjeta perfil de mascota (avatar, badge Healthy, dl de stats, next checkup)
+- **StatusCard**: búsqueda habilitada arriba, lista de mascotas con badges semánticos (texto, nunca solo color), alert warning contextual, footer global discreto
 
 ## Qué NO hacer
 

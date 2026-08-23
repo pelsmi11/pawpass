@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { listPetTypes } from "@/db/queries";
-import { createRequestId } from "@/lib/request-context";
-import { getOrCreateSessionId } from "@/lib/session";
+import { getOrCreateSessionId } from "@/services/session";
+import { createRequestId } from "@/utils/functions";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export const GET = async () => {
   const requestId = createRequestId();
   await getOrCreateSessionId();
   try {
@@ -20,10 +20,10 @@ export async function GET() {
     return NextResponse.json(
       {
         ok: false,
-        message: "No pudimos cargar los tipos de mascota.",
+        errorCode: "PET_TYPES_LOAD_FAILED",
         supportId: requestId,
       },
       { status: 500 },
     );
   }
-}
+};

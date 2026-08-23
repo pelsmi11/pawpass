@@ -1,37 +1,40 @@
 import { NextResponse } from "next/server";
 
 import { createPet, findPetTypeById, listRecentPets } from "@/db/queries";
-import { createRequestId } from "@/lib/request-context";
-import { getOrCreateSessionId } from "@/lib/session";
-import { validatePetInput } from "@/lib/validation";
+import { getOrCreateSessionId } from "@/services/session";
+import { createRequestId } from "@/utils/functions";
+import { validatePetInput } from "@/validation/petValidation";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export const GET = async () => {
   const requestId = createRequestId();
   await getOrCreateSessionId();
 
   try {
     const pets = await listRecentPets();
     // Ensure session_id never leaks (defense in depth)
-    const sanitized = (pets as unknown as Record<string, unknown>[]).map(
-      ({ sessionId, session_id, ...rest }) => rest,
-    );
+    const sanitized = (pets as unknown as Record<string, unknown>[]).map((pet) => {
+      const publicPet = { ...pet };
+      delete publicPet.sessionId;
+      delete publicPet.session_id;
+      return publicPet;
+    });
     return NextResponse.json({ ok: true, pets: sanitized, requestId }, { status: 200 });
   } catch (e) {
     console.error("[GET /api/pets] failed", e);
     return NextResponse.json(
       {
         ok: false,
-        message: "No pudimos cargar las mascotas.",
+        errorCode: "PETS_LOAD_FAILED",
         supportId: requestId,
       },
       { status: 500 },
     );
   }
-}
+};
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   const requestId = createRequestId();
   const sessionId = await getOrCreateSessionId();
 
@@ -42,8 +45,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        message: "Revisa los datos ingresados.",
-        fieldErrors: { name: "Datos inválidos." },
+        errorCode: "VALIDATION_FAILED",
+        fieldErrorCodes: { name: "INVALID_BODY" },
         supportId: requestId,
       },
       { status: 400 },
@@ -60,8 +63,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        message: "Revisa los datos ingresados.",
-        fieldErrors: { sessionId: "No permitido." },
+        errorCode: "VALIDATION_FAILED",
+        fieldErrorCodes: { sessionId: "SESSION_FIELD_FORBIDDEN" },
         supportId: requestId,
       },
       { status: 400 },
@@ -73,8 +76,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        message: validation.message,
-        fieldErrors: validation.fieldErrors,
+        errorCode: "VALIDATION_FAILED",
+        fieldErrorCodes: validation.fieldErrorCodes,
         supportId: requestId,
       },
       { status: 400 },
@@ -86,8 +89,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        message: "Revisa los datos ingresados.",
-        fieldErrors: { petTypeId: "Selecciona un tipo válido." },
+        errorCode: "VALIDATION_FAILED",
+        fieldErrorCodes: { petTypeId: "PET_TYPE_INVALID" },
         supportId: requestId,
       },
       { status: 400 },
@@ -106,7 +109,9 @@ export async function POST(request: Request) {
     );
 
     // Exclude sessionId from public response (FR-015, FR-029)
-    const { sessionId: _sessionId, ...petPublic } = pet as unknown as Record<string, unknown>;
+    const petPublic = { ...(pet as unknown as Record<string, unknown>) };
+    delete petPublic.sessionId;
+    delete petPublic.session_id;
 
     return NextResponse.json(
       {
@@ -124,10 +129,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        message: "No pudimos registrar tu mascota.",
+        errorCode: "PET_CREATE_FAILED",
         supportId: requestId,
       },
       { status: 500 },
     );
   }
-}
+};

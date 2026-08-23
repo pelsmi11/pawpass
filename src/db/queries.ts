@@ -3,25 +3,25 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "./client";
 import { petTypes, pets } from "./schema";
 
-export async function listPetTypes(database: typeof db = db) {
+export const listPetTypes = async (database: typeof db = db) => {
   return database.select().from(petTypes).orderBy(petTypes.code);
-}
+};
 
-export async function findPetTypeById(
+export const findPetTypeById = async (
   id: string,
   database: typeof db = db,
-) {
+) => {
   const rows = await database
     .select()
     .from(petTypes)
     .where(eq(petTypes.id, id));
   return rows[0] ?? null;
-}
+};
 
 // Alias for service usage
 export const getPetTypeById = findPetTypeById;
 
-export async function createPet(
+export const createPet = async (
   values: {
     name: string;
     petTypeId: string;
@@ -30,7 +30,7 @@ export async function createPet(
     sessionId: string;
   },
   database: typeof db = db,
-) {
+) => {
   const [pet] = await database
     .insert(pets)
     .values({
@@ -42,9 +42,9 @@ export async function createPet(
     })
     .returning();
   return pet;
-}
+};
 
-export async function listRecentPets(database: typeof db = db) {
+export const listRecentPets = async (database: typeof db = db) => {
   const rows = await database
     .select({
       id: pets.id,
@@ -66,4 +66,4 @@ export async function listRecentPets(database: typeof db = db) {
 
   // Exclude session_id from public projection (FR-015, FR-029)
   return rows;
-}
+};

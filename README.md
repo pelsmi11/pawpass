@@ -1,6 +1,6 @@
 # PawPass
 
-Aplicación Next.js App Router para registro de mascotas. Parte del workspace `PawPass + Cloud Run Doctor`. Esta fundación instala la base visual cálida y los gates de calidad sin implementar lógica de negocio.
+Aplicación Next.js App Router para registro de mascotas. Parte del workspace `PawPass + Cloud Run Doctor`. La interfaz usa `next-intl` con rutas en inglés y español.
 
 ## Requisitos
 
@@ -29,7 +29,7 @@ No modifica `pnpm-lock.yaml`. Si falla por lock desactualizado, actualizar depen
 - `GET /api/pet-types` → `{ok, petTypes:[{id,code,title}], requestId}` (lee catálogo, asegura `pawpass_session`)
 - `GET /api/session` → `{ok:true}` (crea/confirma cookie `pawpass_session` HttpOnly SameSite=Lax Secure prod Max-Age 86400; nunca expone `sessionId` en body)
 - `GET /api/pets` → `{ok, pets:[{id,name,petTypeId,age,ownerName,createdAt, petType:{id,code,title}}], requestId}` máx 50, orden `created_at DESC`, nunca expone `session_id`
-- `POST /api/pets` → `{name, petTypeId, age?, ownerName}` → `201 {ok, pet, requestId}` o `400 {ok:false, message, fieldErrors, supportId}` (rechazo estricto si body trae `sessionId`/`session_id`; validación Zod en español; `supportId` = `requestId`)
+- `POST /api/pets` → `{name, petTypeId, age?, ownerName}` → `201 {ok, pet, requestId}` o `400 {ok:false, errorCode, fieldErrorCodes, supportId}` (rechazo estricto si body trae `sessionId`/`session_id`; la UI traduce códigos; `supportId` = `requestId`)
 
 ## Scripts
 
@@ -52,33 +52,37 @@ No modifica `pnpm-lock.yaml`. Si falla por lock desactualizado, actualizar depen
 pawpass/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx (SiteHeader + PawpassHero + PetForm + PetList + StatusCard)
+│   │   ├── [locale]/layout.tsx
+│   │   ├── [locale]/page.tsx (rutas `/en` y `/es`)
 │   │   ├── globals.css (tokens HSL cálidos, strategy hsl(var(--)))
 │   │   └── api/
 │   │       ├── pet-types/route.ts
 │   │       ├── pets/route.ts (GET list 50 + POST create)
 │   │       └── session/route.ts
+│   ├── i18n/ (routing, request y navegación localizada)
+│   ├── proxy.ts (redirección `/` → `/en`, excluye APIs/assets)
 │   ├── components/
 │   │   ├── ui/ (button, card, badge, alert, skeleton, input, label — 7)
-│   │   ├── site-header.tsx, pawpass-hero.tsx, status-card.tsx
-│   │   ├── pet-form.tsx (RHF+Zod, usa GET /api/pet-types, Tab/Enter navegable)
-│   │   ├── pet-list.tsx (lista 50, estado vacío en español)
-│   │   ├── providers.tsx (QueryClientProvider)
+│   │   ├── index.ts (barrel de componentes propios)
+│   │   ├── SiteHeader.tsx, PawpassHero.tsx, StatusCard.tsx
+│   │   ├── PetForm.tsx (RHF+Zod, usa GET /api/pet-types, Tab/Enter navegable)
+│   │   ├── PetList.tsx (lista 50, estado vacío en español)
+│   │   ├── Providers.tsx (QueryClientProvider)
 │   │   └── *.test.tsx (incluye Tab/Enter y límites 100/101)
+│   ├── hooks/ (custom hooks y barrel `index.ts`)
+│   ├── interface/ (tipos de dominio, API y validación)
+│   ├── utils/
+│   │   ├── constant/ (constantes propias)
+│   │   └── functions/ (funciones puras y builders API)
 │   ├── db/
 │   │   ├── schema.ts (pet_types, pets con índice session_id)
 │   │   ├── client.ts (pooled neon http)
 │   │   └── queries.ts (listPetTypes, findPetTypeById, createPet, listRecentPets)
 │   ├── services/
-│   │   └── pet.service.ts (orquesta validación → catálogo → sesión → insert)
-│   └── lib/
-│       ├── utils.ts (cn)
-│       ├── format.ts
-│       ├── validation.ts (Zod, mensajes ES, 100/101 límites, rechazo sessionId)
-│       ├── session.ts (cookie pawpass_session, no headers)
-│       ├── request-context.ts (requestId UUID)
-│       └── errors.ts
+│   │   ├── petService.ts (orquesta validación → catálogo → sesión → insert)
+│   │   └── session.ts (cookie pawpass_session, no headers)
+│   ├── validation/petValidation.ts (Zod, códigos estables, límites 100/101, rechazo sessionId)
+│   └── lib/utils.ts (shim compatible para shadcn)
 ├── drizzle/
 │   ├── 0001_pet_catalog_and_pets.sql
 │   └── meta/_journal.json
@@ -111,6 +115,14 @@ ls src/components/ui | wc -l  # 7
 
 - Cookie `pawpass_session` (UUID, HttpOnly, SameSite=Lax, Secure prod, 24h) se crea al primer request relevante vía `GET /api/session` o cualquier handler que llame `getOrCreateSessionId()`. Nunca via header `Authorization` ni body.
 - `POST /api/pets` persiste `session_id` en `pets.session_id` (indexado) y nunca lo expone en respuestas públicas.
+
+## Internacionalización
+
+- Locales soportados: `en` y `es`; inglés es el predeterminado.
+- Todas las páginas usan prefijo obligatorio y `/` redirige a `/en`.
+- El selector `EN / ES` conserva la ruta actual; las APIs permanecen en `/api/*`.
+- `DOG` y `CAT` se traducen por `code`; el `title` persistido se conserva como fallback para códigos futuros.
+- Los errores de API usan `errorCode`/`fieldErrorCodes`; ningún handler devuelve texto humano localizado.
 
 ## Checks adicionales (SPEC-002)
 

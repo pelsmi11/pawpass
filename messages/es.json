@@ -1,0 +1,113 @@
+{
+  "Metadata": {
+    "title": "PawPass · Registro de salud para mascotas",
+    "description": "Un registro amigable y confiable para tus mascotas: expedientes, recordatorios y revisiones en un solo lugar."
+  },
+  "LocaleSwitcher": {
+    "label": "Idioma",
+    "switchTo": "Cambiar a {language}",
+    "en": "inglés",
+    "es": "español"
+  },
+  "Header": {
+    "skipToContent": "Saltar al contenido",
+    "home": "Inicio de PawPass",
+    "main": "Principal",
+    "pets": "Mascotas",
+    "health": "Salud",
+    "reminders": "Recordatorios",
+    "register": "Registrar una mascota"
+  },
+  "Hero": {
+    "badge": "Nuevo · Pasaporte digital para mascotas",
+    "title": "El cuidado de tus mascotas, siempre cerca",
+    "description": "Un registro amigable y confiable para tus mascotas. Mantén juntos sus expedientes, recordatorios y estado de salud, con una experiencia cálida y serena.",
+    "register": "Registrar una mascota",
+    "viewPets": "Ver mascotas",
+    "verifiedRecords": "Expedientes veterinarios verificados",
+    "careReminders": "Recordatorios de cuidado",
+    "trustedBySitters": "Confiable para sus cuidadores",
+    "goldenRetriever": "Golden retriever",
+    "profileAge": "{age, plural, one {# año} other {# años}}",
+    "healthy": "Saludable",
+    "visits": "Visitas",
+    "weight": "Peso",
+    "vaccines": "Vacunas",
+    "upToDate": "Al día",
+    "nextCheckup": "Próxima revisión"
+  },
+  "StatusCard": {
+    "recentPets": "Mascotas recientes",
+    "description": "Actividad reciente de tus mascotas.",
+    "registered": "{count, plural, one {# registrada} other {# registradas}}",
+    "searchLabel": "Buscar mascotas",
+    "searchPlaceholder": "Buscar por nombre o microchip",
+    "petList": "Lista de mascotas",
+    "goldenRetriever": "Golden retriever",
+    "domesticShorthair": "Gato doméstico de pelo corto",
+    "petDetail": "{breed} · {lastVisit}",
+    "lastVisitToday": "Última visita hoy",
+    "lastVisitDate": "Última visita el {date}",
+    "healthy": "Saludable",
+    "dueSoon": "Próximo vencimiento",
+    "vaccineReminder": "Recordatorio de vacuna",
+    "reminder": "El refuerzo antirrábico de Milo vence el {date}. Programa una visita veterinaria para mantenerlo al día."
+  },
+  "PetForm": {
+    "title": "Registrar una mascota",
+    "loadingTypes": "Cargando tipos de mascota",
+    "loadErrorTitle": "Error",
+    "loadErrorDescription": "No pudimos cargar los tipos de mascota. Intenta de nuevo.",
+    "successTitle": "¡Éxito!",
+    "successMessage": "¡Mascota registrada! {name} ya aparece en la lista.",
+    "errorTitle": "Error",
+    "supportCode": "Código de soporte: {code}",
+    "nameLabel": "Nombre de la mascota",
+    "namePlaceholder": "Ej. Luna",
+    "typeLabel": "Tipo de mascota",
+    "typePlaceholder": "Selecciona un tipo",
+    "ageLabel": "Edad (opcional)",
+    "agePlaceholder": "Ej. 3",
+    "ownerLabel": "Nombre del propietario",
+    "ownerPlaceholder": "Ej. Ana",
+    "submitting": "Registrando...",
+    "submit": "Registrar mascota"
+  },
+  "PetList": {
+    "title": "Mascotas registradas",
+    "errorTitle": "No pudimos cargar tus mascotas",
+    "loadError": "No pudimos cargar las mascotas. Intenta de nuevo.",
+    "retry": "Reintentar",
+    "empty": "No hay mascotas registradas aún. ¡Sé el primero en registrar una!",
+    "listLabel": "Lista de mascotas",
+    "age": "{age, plural, one {# año} other {# años}}"
+  },
+  "PetTypes": {
+    "DOG": "Perro",
+    "CAT": "Gato"
+  },
+  "Errors": {
+    "api": {
+      "VALIDATION_FAILED": "Revisa los datos ingresados.",
+      "PET_TYPES_LOAD_FAILED": "No pudimos cargar los tipos de mascota.",
+      "PETS_LOAD_FAILED": "No pudimos cargar las mascotas.",
+      "PET_CREATE_FAILED": "No pudimos registrar tu mascota.",
+      "UNKNOWN": "Ocurrió un error. Intenta de nuevo."
+    },
+    "field": {
+      "INVALID_BODY": "Los datos enviados no son válidos.",
+      "SESSION_FIELD_FORBIDDEN": "Este campo no está permitido.",
+      "NAME_REQUIRED": "El nombre es obligatorio.",
+      "NAME_TOO_LONG": "El nombre no puede superar 100 caracteres.",
+      "PET_TYPE_INVALID": "Selecciona un tipo válido.",
+      "AGE_NOT_NUMBER": "La edad debe ser un número.",
+      "AGE_NOT_INTEGER": "La edad debe ser un número entero.",
+      "AGE_OUT_OF_RANGE": "La edad debe estar entre 0 y 100.",
+      "OWNER_NAME_REQUIRED": "El nombre del propietario es obligatorio.",
+      "OWNER_NAME_TOO_LONG": "El nombre del propietario no puede superar 100 caracteres."
+    }
+  },
+  "Footer": {
+    "message": "© 2026 · Hecho con cariño para las mascotas y sus personas."
+  }
+}

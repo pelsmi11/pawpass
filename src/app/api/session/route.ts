@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { getOrCreateSessionId } from "@/lib/session";
+import { getOrCreateSessionId } from "@/services/session";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export const GET = async () => {
   await getOrCreateSessionId();
   return NextResponse.json({ ok: true }, { status: 200 });
-}
+};

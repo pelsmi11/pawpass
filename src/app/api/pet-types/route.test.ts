@@ -3,16 +3,16 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 vi.mock("@/db/queries", () => ({
   listPetTypes: vi.fn(),
 }));
-vi.mock("@/lib/session", () => ({
+vi.mock("@/services/session", () => ({
   getOrCreateSessionId: vi.fn().mockResolvedValue("11111111-1111-4111-8111-111111111111"),
 }));
-vi.mock("@/lib/request-context", () => ({
+vi.mock("@/utils/functions", () => ({
   createRequestId: vi.fn().mockReturnValue("22222222-2222-4222-8222-222222222222"),
 }));
 
 import { GET } from "./route";
 import { listPetTypes } from "@/db/queries";
-import { createRequestId } from "@/lib/request-context";
+import { createRequestId } from "@/utils/functions";
 
 describe("GET /api/pet-types", () => {
   beforeEach(() => {
@@ -47,7 +47,8 @@ describe("GET /api/pet-types", () => {
     expect(res.status).toBe(500);
     expect(json.ok).toBe(false);
     expect(json.supportId).toBe("22222222-2222-4222-8222-222222222222");
-    expect(json.message).not.toContain("23503");
+    expect(json.errorCode).toBe("PET_TYPES_LOAD_FAILED");
+    expect(json).not.toHaveProperty("message");
   });
 
   it("generates distinct requestId per call when mocked sequentially", async () => {

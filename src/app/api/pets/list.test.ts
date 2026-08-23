@@ -6,11 +6,11 @@ vi.mock("@/db/queries", () => ({
   createPet: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/services/session", () => ({
   getOrCreateSessionId: vi.fn().mockResolvedValue("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"),
 }));
 
-vi.mock("@/lib/request-context", () => ({
+vi.mock("@/utils/functions", () => ({
   createRequestId: vi.fn().mockReturnValue("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
 }));
 

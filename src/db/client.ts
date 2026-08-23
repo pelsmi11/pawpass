@@ -3,9 +3,9 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 import * as schema from "./schema";
 
-function createDb(url: string) {
+const createDb = (url: string) => {
   return drizzle(neon(url), { schema });
-}
+};
 
 // Pooled HTTP connection for normal app traffic (FR-031)
 export const db = createDb(process.env.DATABASE_URL!);
