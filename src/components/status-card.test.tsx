@@ -3,16 +3,31 @@ import { describe, expect, it } from "vitest";
 import { StatusCard } from "./status-card";
 
 describe("StatusCard", () => {
-  it("renders card title and badge", () => {
+  it("renders section heading and count badge", () => {
     render(<StatusCard />);
-    expect(screen.getByText("Recent pets")).toBeInTheDocument();
-    expect(screen.getByText("Healthy")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Recent pets" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 registered")).toBeInTheDocument();
   });
 
-  it("renders alert and disabled input", () => {
+  it("renders pet rows with semantic badges", () => {
     render(<StatusCard />);
-    expect(screen.getByText("All good")).toBeInTheDocument();
-    expect(screen.getByLabelText("Search pets")).toBeInTheDocument();
-    expect(screen.getByLabelText("Search pets")).toBeDisabled();
+    expect(screen.getByText("Luna")).toBeInTheDocument();
+    expect(screen.getByText("Milo")).toBeInTheDocument();
+    expect(screen.getByText("Healthy")).toBeInTheDocument();
+    expect(screen.getByText("Due soon")).toBeInTheDocument();
+  });
+
+  it("renders enabled labeled search input", () => {
+    render(<StatusCard />);
+    const input = screen.getByLabelText("Search pets");
+    expect(input).toBeEnabled();
+  });
+
+  it("renders vaccine reminder alert", () => {
+    render(<StatusCard />);
+    expect(screen.getByText("Vaccine reminder")).toBeInTheDocument();
+    expect(screen.getByText(/rabies booster/i)).toBeInTheDocument();
   });
 });

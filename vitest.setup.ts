@@ -10,6 +10,8 @@ afterEach(() => {
 vi.mock("next/font/google", () => ({
   Geist: () => ({ variable: "--font-geist-sans" }),
   Geist_Mono: () => ({ variable: "--font-geist-mono" }),
+  Nunito_Sans: () => ({ variable: "--font-nunito-sans" }),
+  Varela_Round: () => ({ variable: "--font-varela-round" }),
 }));
 
 vi.mock("next/image", () => ({
