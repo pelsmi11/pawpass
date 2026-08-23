@@ -13,9 +13,9 @@
     "skipToContent": "Saltar al contenido",
     "home": "Inicio de PawPass",
     "main": "Principal",
+    "register": "Registrar",
     "pets": "Mascotas",
-    "health": "Salud",
-    "reminders": "Recordatorios",
+    "lab": "Laboratorio",
     "register": "Registrar una mascota"
   },
   "Hero": {
@@ -84,7 +84,8 @@
   },
   "PetTypes": {
     "DOG": "Perro",
-    "CAT": "Gato"
+    "CAT": "Gato",
+    "REPTILE": "Reptil"
   },
   "Errors": {
     "api": {
@@ -92,6 +93,10 @@
       "PET_TYPES_LOAD_FAILED": "No pudimos cargar los tipos de mascota.",
       "PETS_LOAD_FAILED": "No pudimos cargar las mascotas.",
       "PET_CREATE_FAILED": "No pudimos registrar tu mascota.",
+      "LAB_DISABLED": "El laboratorio está deshabilitado.",
+      "INVALID_DEMO_TOKEN": "Token de demo inválido.",
+      "INTERNAL_ERROR": "Ocurrió un error. Intenta de nuevo.",
+      "SERVICE_UNAVAILABLE": "Servicio no disponible. Intenta de nuevo.",
       "UNKNOWN": "Ocurrió un error. Intenta de nuevo."
     },
     "field": {
@@ -106,6 +111,34 @@
       "OWNER_NAME_REQUIRED": "El nombre del propietario es obligatorio.",
       "OWNER_NAME_TOO_LONG": "El nombre del propietario no puede superar 100 caracteres."
     }
+  },
+  "Common": {
+    "accept": "Aceptar",
+    "cancel": "Cancelar"
+  },
+  "DemoLab": {
+    "title": "Controles del laboratorio",
+    "description": "Activa y restablece incidentes controlados para la demo. El panel siempre es visible; solo las escrituras requieren el token.",
+    "statusTitle": "Estado actual",
+    "databaseOutage": "Outage de base de datos",
+    "highLatency": "Latencia alta",
+    "latencyMs": "Latencia (ms)",
+    "tokenLabel": "Token de demo",
+    "tokenPlaceholder": "Ingresa el token de demo",
+    "clear": "Limpiar",
+    "activate": "Activar outage",
+    "reset": "Restablecer laboratorio",
+    "confirmOutageTitle": "¿Activar outage de base de datos?",
+    "confirmOutage": "El próximo registro fallará con 503 y se mostrará un código de soporte. Puedes volver a la operación normal con Restablecer.",
+    "confirmResetTitle": "¿Restablecer laboratorio?",
+    "confirmReset": "Se limpiará el estado de outage y el registro volverá a funcionar normalmente.",
+    "loading": "Cargando estado...",
+    "error": "No se pudo cargar el estado",
+    "outageActive": "Outage activo",
+    "outageInactive": "Normal",
+    "supportCode": "Código de soporte: {code}",
+    "copy": "Copiar",
+    "copied": "Copiado"
   },
   "Footer": {
     "message": "© 2026 · Hecho con cariño para las mascotas y sus personas."

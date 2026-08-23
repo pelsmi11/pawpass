@@ -17,34 +17,43 @@ pnpm install --frozen-lockfile
 
 No modifica `pnpm-lock.yaml`. Si falla por lock desactualizado, actualizar dependencias y commitear nuevo lock solo si se añadió dep justificada.
 
-## Persistencia y catálogo
+## Persistencia, catálogo y laboratorio
 
-- **Neon + Drizzle**: `pawpass/src/db/schema.ts` define `pet_types(id UUID PK, code UNIQUE, title)` y `pets(id UUID PK, name, pet_type_id FK, age INT 0-100, owner_name, session_id UUID INDEXED, created_at TIMESTAMPTZ)` — mapeo API `petTypeId` ↔ DB `pet_type_id` ↔ Drizzle `petTypeId`.
-- **Migración**: `pawpass/drizzle/0001_pet_catalog_and_pets.sql` con índice `pets_session_id_idx` y seeds `DOG→Perro`, `CAT→Gato`. Aplicar con `pnpm exec drizzle-kit migrate` (no auto-ejecuta al iniciar Next.js).
-- **Clientes**: `pawpass/src/db/client.ts` usa `@neondatabase/serverless` pooled HTTP para tráfico normal; `drizzle.config.ts` usa `DATABASE_URL` directa para migraciones.
+- **Neon + Drizzle**: `pawpass/src/db/schema.ts` define `pet_types(id UUID PK, code UNIQUE, title)`, `pets(id UUID PK, name, pet_type_id FK, age INT 0-100, owner_name, session_id UUID INDEXED, created_at TIMESTAMPTZ)` y `demo_config(id="global" PK CHECK id='global', database_outage bool, high_latency bool, latency_ms int 6000, updated_at TIMESTAMPTZ)` — mapeo API `petTypeCode` (DOG/CAT/REPTILE) → `pet_types.code` → `pet_type_id` UUID; REPTILE usa sentinel `00000000-0000-4000-a000-000000000000` para 23503.
+- **Migraciones**: `pawpass/drizzle/0001_pet_catalog_and_pets.sql` y `0002_demo_config.sql` (CHECK + seed `global,false,false,6000`). Aplicar con `DATABASE_URL_UNPOOLED=... pnpm exec drizzle-kit migrate` (nunca auto-ejecuta al iniciar Next.js; `drizzle.config.ts` exige solo `DATABASE_URL_UNPOOLED`).
+- **Clientes**: `pawpass/src/db/client.ts` `db` (DATABASE_URL pooled) y `getBrokenDb()` lazy (BROKEN_DATABASE_URL, solo con `database_outage=true`); `DATABASE_URL_UNPOOLED` solo migraciones.
+- **Catálogo constante**: `pawpass/src/utils/constant/petCatalog.ts` exporta `PET_TYPE_CODES=["DOG","CAT","REPTILE"]` y `REPTILE_SENTINEL_UUID`; formulario usa constante + `next-intl` (no `GET /api/pet-types`); `GET /api/pet-types` conserva verdad persistida (solo DOG/CAT).
+- **Laboratorio**: `demo_config` single-row `global` gobierna `db` vs `getBrokenDb()`; panel `DemoLabPanel` siempre visible `#demo-lab` con `GET /api/demo/status` público; writes requieren `x-demo-token` vs `DEMO_CONTROL_TOKEN` + `DEMO_LAB_ENABLED=true` (403 LAB_DISABLED / 403 INVALID_DEMO_TOKEN); `BROKEN` produce 503, REPTILE 23503 produce 500 con `supportId === requestId` UUID puro.
 - `.env.example` mantiene valores ficticios; `.env.local` ignorado.
 
 ## API
 
-- `GET /api/pet-types` → `{ok, petTypes:[{id,code,title}], requestId}` (lee catálogo, asegura `pawpass_session`)
+- `GET /api/health` → `{status:"ok", service:"pawpass", requestId}` (200 siempre, sin DB)
+- `GET /api/pet-types` → `{ok, petTypes:[{id,code,title}], requestId}` (solo DOG/CAT, asegura `pawpass_session`)
 - `GET /api/session` → `{ok:true}` (crea/confirma cookie `pawpass_session` HttpOnly SameSite=Lax Secure prod Max-Age 86400; nunca expone `sessionId` en body)
 - `GET /api/pets` → `{ok, pets:[{id,name,petTypeId,age,ownerName,createdAt, petType:{id,code,title}}], requestId}` máx 50, orden `created_at DESC`, nunca expone `session_id`
-- `POST /api/pets` → `{name, petTypeId, age?, ownerName}` → `201 {ok, pet, requestId}` o `400 {ok:false, errorCode, fieldErrorCodes, supportId}` (rechazo estricto si body trae `sessionId`/`session_id`; la UI traduce códigos; `supportId` = `requestId`)
+- `POST /api/pets` → `{name, petTypeCode:"DOG"|"CAT"|"REPTILE", age?, ownerName}` → `201 {ok, pet, requestId}` (DOG/CAT), `500 {ok:false, errorCode:"INTERNAL_ERROR", supportId}` (REPTILE → 23503), `503 {ok:false, errorCode:"SERVICE_UNAVAILABLE", supportId}` (outage), `400 {ok:false, errorCode, fieldErrorCodes, supportId}` (validación; rechaza `petTypeId`/`sessionId`/`session_id`; `supportId` = `requestId` UUID puro)
+- `GET /api/demo/status` → `{ok, demo:{databaseOutage, highLatency, latencyMs, updatedAt}, requestId}` público, sin secretos
+- `POST /api/demo/database-outage` → `x-demo-token` + `DEMO_LAB_ENABLED=true` → `200 {ok:true, demo, requestId}` o `403 {ok:false, errorCode:"LAB_DISABLED"|"INVALID_DEMO_TOKEN", supportId}`; log `DEMO_DATABASE_OUTAGE_ACTIVATED`
+- `POST /api/demo/reset` → idem `403` o `200` + `DEMO_INCIDENT_RESET`, siempre con `db` normal, establece `false/false/6000`
+- Logs JSON single-line `service:"pawpass"` con `severity/message/event/route/sessionId/requestId/httpStatus/durationMs/petTypeCode/errorType/databaseCode/incident` (sin PII/secretos/URLs)
 
 ## Scripts
 
 | Script | Comando | Descripción |
 |--------|---------|-------------|
 | `dev` | `next dev` | Desarrollo |
-| `build` | `next build` | Build producción |
+| `build` | `next build` | Build producción (sin Neon, con `DATABASE_URL` ficticia válida si no hay `.env.local`) |
 | `start` | `next start` | Servir build |
 | `lint` | `eslint .` | ESLint flat config |
-| `typecheck` | `tsc --noEmit` | Tipos |
+| `typecheck` | `tsc --noEmit` | Tipos (`forceConsistentCasingInFileNames:true`) |
 | `test` | `vitest` | Watch |
 | `test:unit` | `vitest run` | Unitario |
-| `test:coverage` | `vitest run --coverage` | Cobertura V8 80% |
-| `verify` | `pnpm typecheck && pnpm test:coverage` | Gate Husky/CI |
-| `prepare` | `node .husky/install.mjs` | Instala hooks Husky |
+| `test:coverage` | `vitest run --coverage` | Cobertura V8 80% (4 métricas) |
+| `test:integration` | `vitest run --config vitest.config.integration.mts` | Integración Neon opt-in (requiere `DATABASE_URL`/`UNPOOLED`/`BROKEN` de rama aislada, verifica sentinel 23503 y outage; no en precommit) |
+| `verify` | `pnpm lint && pnpm typecheck && pnpm test:coverage` | Gate Husky/CI (sin Neon, sin build) |
+| `verify:full` | `pnpm verify && pnpm build` | Gate final antes de PR/deploy (sin Neon) |
+| `prepare` | `node .husky/install.mjs` | Instala hooks Husky (omite en `CI=true` o `NODE_ENV=production`) |
 
 ## Estructura
 

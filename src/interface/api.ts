@@ -4,7 +4,11 @@ export type ApiErrorCode =
   | "VALIDATION_FAILED"
   | "PET_TYPES_LOAD_FAILED"
   | "PETS_LOAD_FAILED"
-  | "PET_CREATE_FAILED";
+  | "PET_CREATE_FAILED"
+  | "LAB_DISABLED"
+  | "INVALID_DEMO_TOKEN"
+  | "INTERNAL_ERROR"
+  | "SERVICE_UNAVAILABLE";
 
 export type ErrorResponse = {
   ok: false;

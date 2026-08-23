@@ -8,6 +8,13 @@
       "when": 1724284800000,
       "tag": "0001_pet_catalog_and_pets",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1724880000000,
+      "tag": "0002_demo_config",
+      "breakpoints": true
     }
   ]
 }

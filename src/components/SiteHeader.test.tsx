@@ -15,7 +15,7 @@ describe("SiteHeader", () => {
     const nav = screen.getByRole("navigation", { name: "Main" });
     expect(nav).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Pets" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Reminders" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Lab" })).toBeInTheDocument();
   });
 
   it("renders primary CTA", () => {

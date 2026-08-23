@@ -21,7 +21,7 @@ export type Pet = {
 
 export type CreatePetInput = {
   name: string;
-  petTypeId: string;
+  petTypeCode: string;
   age?: number;
   ownerName: string;
 };

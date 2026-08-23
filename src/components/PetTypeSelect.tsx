@@ -22,7 +22,7 @@ export const PetTypeSelect = ({
 }: PetTypeSelectProps) => {
   return (
     <Controller
-      name="petTypeId"
+      name="petTypeCode"
       control={control}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>

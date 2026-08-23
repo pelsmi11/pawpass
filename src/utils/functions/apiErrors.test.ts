@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildErrorResponse,
   buildSuccessResponse,
+  classifyError,
   isApiErrorCode,
 } from "./apiErrors";
 
@@ -36,5 +37,17 @@ describe("API error contracts", () => {
       pets: [],
       requestId: "request-1",
     });
+  });
+
+  it("classifies 23503 as ForeignKeyViolation", () => {
+    expect(classifyError({ code: "23503" }, false)).toEqual({ errorType: "ForeignKeyViolation", databaseCode: "23503" });
+  });
+
+  it("classifies outage context as DatabaseUnavailableError", () => {
+    expect(classifyError(new Error("conn"), true)).toEqual({ errorType: "DatabaseUnavailableError" });
+  });
+
+  it("classifies unknown as UnexpectedError", () => {
+    expect(classifyError(new Error("x"), false).errorType).toBe("UnexpectedError");
   });
 });

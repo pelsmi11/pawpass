@@ -1,6 +1,7 @@
-import { createPet, findPetTypeById } from "@/db/queries";
+import { createPet, findPetTypeByCode } from "@/db/queries";
 import type { db } from "@/db/client";
 import type { FieldErrorCodes } from "@/interface";
+import { REPTILE_SENTINEL_UUID } from "@/utils/constant/petCatalog";
 import { validatePetInput } from "@/validation/petValidation";
 
 type CreateResult =
@@ -12,8 +13,10 @@ type CreateResult =
 
 /**
  * Orchestrates pet creation:
- * 1. Validate input (including strict sessionId rejection)
- * 2. Verify petTypeId exists in catalog
+ * 1. Validate input (including strict sessionId/petTypeId rejection)
+ * 2. Resolve petTypeCode to pet_type_id
+ *    - DOG/CAT → lookup pet_types.code
+ *    - REPTILE → sentinel UUID (will trigger FK 23503)
  * 3. Insert with sessionId (caller provides sessionId from cookie)
  */
 export const createPetWithValidation = async (
@@ -29,21 +32,24 @@ export const createPetWithValidation = async (
     };
   }
 
-  const petType = await findPetTypeById(
-    validation.data.petTypeId,
-    database,
-  );
-  if (!petType) {
-    return {
-      success: false,
-      fieldErrorCodes: { petTypeId: "PET_TYPE_INVALID" },
-    };
+  let petTypeId: string;
+  if (validation.data.petTypeCode === "REPTILE") {
+    petTypeId = REPTILE_SENTINEL_UUID;
+  } else {
+    const petType = await findPetTypeByCode(validation.data.petTypeCode, database);
+    if (!petType) {
+      return {
+        success: false,
+        fieldErrorCodes: { petTypeCode: "PET_TYPE_INVALID" },
+      };
+    }
+    petTypeId = petType.id;
   }
 
   const pet = await createPet(
     {
       name: validation.data.name,
-      petTypeId: validation.data.petTypeId,
+      petTypeId,
       age: validation.data.age,
       ownerName: validation.data.ownerName,
       sessionId,

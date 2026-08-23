@@ -3,6 +3,13 @@ import { cleanup } from "@testing-library/react";
 import { createElement } from "react";
 import { afterEach, vi } from "vitest";
 
+// Provide dummy env for Neon client so import does not throw in tests
+process.env.DATABASE_URL ||= "postgresql://user:password@127.0.0.1:5432/pawpass?sslmode=disable";
+process.env.DATABASE_URL_UNPOOLED ||= process.env.DATABASE_URL;
+process.env.BROKEN_DATABASE_URL ||= "postgresql://user:invalid@127.0.0.1:5432/pawpass?sslmode=disable";
+process.env.DEMO_LAB_ENABLED ||= "true";
+process.env.DEMO_CONTROL_TOKEN ||= "test-token";
+
 afterEach(() => {
   cleanup();
 });

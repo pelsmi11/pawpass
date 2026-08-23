@@ -1,10 +1,38 @@
 import { desc, eq } from "drizzle-orm";
 
 import { db } from "./client";
-import { petTypes, pets } from "./schema";
+import { demoConfig, petTypes, pets } from "./schema";
 
 export const listPetTypes = async (database: typeof db = db) => {
   return database.select().from(petTypes).orderBy(petTypes.code);
+};
+
+export const getDemoConfig = async (database: typeof db = db) => {
+  const rows = await database.select().from(demoConfig).where(eq(demoConfig.id, "global"));
+  return rows[0] ?? null;
+};
+
+export const setDemoOutage = async (value: boolean, database: typeof db = db) => {
+  const [row] = await database
+    .update(demoConfig)
+    .set({ databaseOutage: value, updatedAt: new Date() })
+    .where(eq(demoConfig.id, "global"))
+    .returning();
+  return row ?? null;
+};
+
+export const resetDemoConfig = async (database: typeof db = db) => {
+  const [row] = await database
+    .update(demoConfig)
+    .set({ databaseOutage: false, highLatency: false, latencyMs: 6000, updatedAt: new Date() })
+    .where(eq(demoConfig.id, "global"))
+    .returning();
+  return row ?? null;
+};
+
+export const findPetTypeByCode = async (code: string, database: typeof db = db) => {
+  const rows = await database.select().from(petTypes).where(eq(petTypes.code, code));
+  return rows[0] ?? null;
 };
 
 export const findPetTypeById = async (

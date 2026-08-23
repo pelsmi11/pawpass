@@ -37,9 +37,9 @@ export const createPetSchema = z.object({
     .trim()
     .min(1, "NAME_REQUIRED")
     .max(100, "NAME_TOO_LONG"),
-  petTypeId: z
-    .string({ message: "PET_TYPE_INVALID" })
-    .uuid("PET_TYPE_INVALID"),
+  petTypeCode: z.enum(["DOG", "CAT", "REPTILE"] as const, {
+    message: "PET_TYPE_INVALID",
+  }),
   age: ageSchema.optional(),
   ownerName: z
     .string({ message: "OWNER_NAME_REQUIRED" })

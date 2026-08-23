@@ -1,22 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type {
-  ApiErrorCode,
-  CreatePetInput,
-  CreatePetResponse,
-  FieldErrorCodes,
-  PetType,
-  PetTypesResponse,
-} from "@/interface";
+import type { ApiErrorCode, CreatePetInput, FieldErrorCodes } from "@/interface";
 import { isApiErrorCode } from "@/utils/functions";
 import { PET_FORM_DEFAULT_VALUES } from "@/utils/constant";
+import { PET_TYPE_CODES } from "@/utils/constant/petCatalog";
 import { createPetSchema, isFieldErrorCode } from "@/validation/petValidation";
 
 export const parseOptionalAge = (value: unknown) => {
@@ -30,33 +23,14 @@ export const usePetForm = () => {
   const tPetType = useTranslations("PetTypes");
   const queryClient = useQueryClient();
 
-  const petTypesQuery = useQuery<PetType[]>({
-    queryKey: ["pet-types"],
-    queryFn: async () => {
-      const response = await fetch("/api/pet-types");
-      const result = (await response.json()) as PetTypesResponse;
-      if (!result.ok || !result.petTypes) throw result;
-      return result.petTypes;
-    },
-  });
-
   const form = useForm<CreatePetInput>({
-    // Zod's input/output generics do not align with react-hook-form's resolver type.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createPetSchema) as any,
     defaultValues: PET_FORM_DEFAULT_VALUES,
   });
-  useEffect(() => {
-    if (!petTypesQuery.isError) return;
-
-    toast.error(t("loadErrorTitle"), {
-      id: "pet-types-load-error",
-      description: t("loadErrorDescription"),
-    });
-  }, [petTypesQuery.isError, t]);
 
   const mutation = useMutation({
-    mutationFn: async (values: CreatePetInput): Promise<CreatePetResponse> => {
+    mutationFn: async (values: CreatePetInput) => {
       const response = await fetch("/api/pets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,7 +46,6 @@ export const usePetForm = () => {
       });
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["pets"] });
-      queryClient.invalidateQueries({ queryKey: ["pet-types"] });
     },
     onError: (error: unknown) => {
       const result = error as {
@@ -86,9 +59,7 @@ export const usePetForm = () => {
         : "UNKNOWN";
       const message = tApiError(errorCode);
       toast.error(t("errorTitle"), {
-        description: result.supportId
-          ? `${message} ${t("supportCode", { code: result.supportId })}`
-          : message,
+        description: result.supportId ? `${message} ${t("supportCode", { code: result.supportId })}` : message,
       });
 
       if (!result.fieldErrorCodes) return;
@@ -103,13 +74,6 @@ export const usePetForm = () => {
 
   const translateFieldError = (value: unknown) =>
     isFieldErrorCode(value) ? tFieldError(value) : tApiError("UNKNOWN");
-  const translatePetType = (petType: PetType) =>
-    petType.code === "DOG" || petType.code === "CAT"
-      ? tPetType(petType.code)
-      : petType.title;
-  const submitValues = (values: CreatePetInput) => {
-    mutation.mutate(values);
-  };
 
   return {
     copy: {
@@ -127,27 +91,20 @@ export const usePetForm = () => {
     },
     control: form.control,
     fieldErrors: {
-      name: form.formState.errors.name
-        ? translateFieldError(form.formState.errors.name.message)
+      name: form.formState.errors.name ? translateFieldError(form.formState.errors.name.message) : null,
+      petTypeCode: form.formState.errors.petTypeCode
+        ? translateFieldError(form.formState.errors.petTypeCode.message)
         : null,
-      petTypeId: form.formState.errors.petTypeId
-        ? translateFieldError(form.formState.errors.petTypeId.message)
-        : null,
-      age: form.formState.errors.age
-        ? translateFieldError(form.formState.errors.age.message)
-        : null,
-      ownerName: form.formState.errors.ownerName
-        ? translateFieldError(form.formState.errors.ownerName.message)
-        : null,
+      age: form.formState.errors.age ? translateFieldError(form.formState.errors.age.message) : null,
+      ownerName: form.formState.errors.ownerName ? translateFieldError(form.formState.errors.ownerName.message) : null,
     },
-    petTypeOptions:
-      petTypesQuery.data?.map((petType) => ({
-        id: petType.id,
-        label: translatePetType(petType),
-      })) ?? [],
-    isPetTypesLoading: petTypesQuery.isLoading,
-    isPetTypesError: petTypesQuery.isError,
+    petTypeOptions: PET_TYPE_CODES.map((code) => ({
+      id: code,
+      label: tPetType(code),
+    })),
+    isPetTypesLoading: false,
+    isPetTypesError: false,
     isSubmitDisabled: mutation.isPending || form.formState.isSubmitting,
-    onSubmit: form.handleSubmit(submitValues as never),
+    onSubmit: form.handleSubmit((values) => mutation.mutate(values as CreatePetInput)),
   };
 };

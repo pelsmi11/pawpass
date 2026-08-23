@@ -1,4 +1,5 @@
-import { index, integer, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { boolean, check, index, integer, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 /**
  * Glossary mapping for pet type identifier:
@@ -30,4 +31,16 @@ export const pets = pgTable(
       .notNull(),
   },
   (table) => [index("pets_session_id_idx").on(table.sessionId)],
+);
+
+export const demoConfig = pgTable(
+  "demo_config",
+  {
+    id: varchar("id", { length: 30 }).primaryKey(),
+    databaseOutage: boolean("database_outage").notNull().default(false),
+    highLatency: boolean("high_latency").notNull().default(false),
+    latencyMs: integer("latency_ms").notNull().default(6000),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [check("demo_config_id_check", sql`${table.id} = 'global'`)],
 );

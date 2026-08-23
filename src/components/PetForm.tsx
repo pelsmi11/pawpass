@@ -11,8 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { parseOptionalAge, usePetForm } from "@/hooks/usePetForm";
 
 /**
- * Glossary: API petTypeId ↔ DB pet_type_id ↔ Drizzle petTypeId
- * The form sends petTypeId (UUID) which maps to DB column pet_type_id.
+ * Glossary: API petTypeCode (DOG/CAT/REPTILE) → DB pet_type_id UUID via pet_types.code
+ * REPTILE uses sentinel UUID to trigger FK 23503.
  */
 export const PetForm = () => {
   const {
@@ -64,7 +64,7 @@ export const PetForm = () => {
             <PetTypeSelect
               control={control}
               disabled={isPetTypesLoading || isPetTypesError}
-              errorMessage={fieldErrors.petTypeId}
+              errorMessage={fieldErrors.petTypeCode}
               label={copy.typeLabel}
               options={petTypeOptions}
               placeholder={copy.typePlaceholder}

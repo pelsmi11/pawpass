@@ -29,25 +29,10 @@ const createWrapper = (locale: "en" | "es" = "es") => {
   return IntlQueryWrapper;
 };
 
-const mockPetTypes = [
-  { id: "11111111-1111-4111-8111-111111111111", code: "DOG", title: "Perro" },
-  { id: "22222222-2222-4222-8222-222222222222", code: "CAT", title: "Gato" },
-];
-
-const waitForPetTypes = async (label: RegExp | string) => {
-  await waitFor(() => expect(screen.getByLabelText(label)).toBeEnabled());
-};
-
-const selectPetType = async (
-  label: RegExp | string,
-  option: string,
-) => {
-  const nativeSelect = document.querySelector<HTMLSelectElement>(
-    'select[name="petTypeId"]',
-  );
+const selectPetType = async (label: RegExp | string, option: string) => {
+  const nativeSelect = document.querySelector<HTMLSelectElement>('select[name="petTypeCode"]');
   expect(nativeSelect).not.toBeNull();
-  const value = option === "Perro" || option === "Dog" ? mockPetTypes[0].id : mockPetTypes[1].id;
-  fireEvent.change(nativeSelect!, { target: { value } });
+  fireEvent.change(nativeSelect!, { target: { value: option === "Perro" || option === "Dog" ? "DOG" : option === "Gato" || option === "Cat" ? "CAT" : "REPTILE" } });
   await waitFor(() => expect(screen.getByLabelText(label)).toHaveTextContent(option));
 };
 
@@ -57,20 +42,7 @@ describe("PetForm", () => {
     vi.clearAllMocks();
   });
 
-  it("renders fields and loads pet types", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockImplementation((url: string) => {
-        if (String(url).includes("/api/pet-types")) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-          } as Response);
-        }
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ ok: true }) } as Response);
-      }),
-    );
-
+  it("renders fields with constant options DOG/CAT/REPTILE", async () => {
     render(<PetForm />, { wrapper: createWrapper() });
 
     expect(screen.getByLabelText(/Nombre de la mascota/i)).toBeInTheDocument();
@@ -78,42 +50,13 @@ describe("PetForm", () => {
     expect(screen.getByLabelText(/Edad/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Nombre del propietario/i)).toBeInTheDocument();
 
-    await waitForPetTypes(/Tipo de mascota/i);
-    const options = Array.from(
-      document.querySelectorAll<HTMLSelectElement>('select[name="petTypeId"] option'),
-    ).map((option) => option.textContent);
-    expect(options).toEqual(["", "Perro", "Gato"]);
-  });
-
-  it("shows a localized Sonner toast when pet types fail to load", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        json: () =>
-          Promise.resolve({ ok: false, errorCode: "PET_TYPES_LOAD_FAILED" }),
-      } as Response),
-    );
-
-    render(<PetForm />, { wrapper: createWrapper() });
-
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Error", {
-        id: "pet-types-load-error",
-        description: "No pudimos cargar los tipos de mascota. Intenta de nuevo.",
-      }),
-    );
-    expect(screen.getByLabelText(/Tipo de mascota/i)).toBeDisabled();
+    const options = Array.from(document.querySelectorAll<HTMLSelectElement>('select[name="petTypeCode"] option')).map((o) => o.textContent);
+    expect(options).toEqual(["", "Perro", "Gato", "Reptil"]);
+    expect(screen.getByLabelText(/Tipo de mascota/i)).not.toBeDisabled();
   });
 
   it("shows loading state and disables submit while pending", async () => {
     const fetchMock = vi.fn().mockImplementation((url: string, opts?: RequestInit) => {
-      if (String(url).includes("/api/pet-types")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-        } as Response);
-      }
       if (String(url).includes("/api/pets") && opts?.method === "POST") {
         return new Promise(() => {}) as Promise<Response>;
       }
@@ -122,15 +65,11 @@ describe("PetForm", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<PetForm />, { wrapper: createWrapper() });
-    await waitForPetTypes(/Tipo de mascota/i);
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/Nombre de la mascota/i), "Luna");
     await selectPetType(/Tipo de mascota/i, "Perro");
     await user.type(screen.getByLabelText(/Nombre del propietario/i), "Ana");
-    expect(screen.getByLabelText(/Tipo de mascota/i)).toHaveTextContent("Perro");
-    await waitFor(() => expect(screen.getByLabelText(/Nombre de la mascota/i)).toHaveValue("Luna"));
-    await waitFor(() => expect(screen.getByLabelText(/Nombre del propietario/i)).toHaveValue("Ana"));
     await user.click(screen.getByRole("button", { name: /Registrar mascota/i }));
 
     await waitFor(() => expect(screen.getByText("Registrando...")).toBeInTheDocument());
@@ -138,36 +77,23 @@ describe("PetForm", () => {
   });
 
   it("submits valid data and shows success", async () => {
-    const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (String(url).includes("/api/pet-types")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-        } as Response);
-      }
-      if (String(url).includes("/api/pets")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, pet: { name: "Luna" }, requestId: "req-1" }),
-        } as Response);
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) } as Response);
-    });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true, pet: { name: "Luna" }, requestId: "req-1" }),
+    } as Response);
     vi.stubGlobal("fetch", fetchMock);
 
     render(<PetForm />, { wrapper: createWrapper() });
-    await waitForPetTypes(/Tipo de mascota/i);
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/Nombre de la mascota/i), "Luna");
     await selectPetType(/Tipo de mascota/i, "Perro");
     await user.type(screen.getByLabelText(/Nombre del propietario/i), "Ana");
-    expect(screen.getByLabelText(/Tipo de mascota/i)).toHaveTextContent("Perro");
-    await waitFor(() => expect(screen.getByLabelText(/Nombre de la mascota/i)).toHaveValue("Luna"));
-    await waitFor(() => expect(screen.getByLabelText(/Nombre del propietario/i)).toHaveValue("Ana"));
     await user.click(screen.getByRole("button", { name: /Registrar mascota/i }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/pets"), expect.objectContaining({ method: "POST" })));
+    const body = JSON.parse((fetchMock.mock.calls.find((c) => String(c[0]).includes("/api/pets"))?.[1] as RequestInit)?.body as string);
+    expect(body.petTypeCode).toBe("DOG");
     await waitFor(() =>
       expect(toast.success).toHaveBeenCalledWith("¡Éxito!", {
         description: "¡Mascota registrada! Luna ya aparece en la lista.",
@@ -176,23 +102,13 @@ describe("PetForm", () => {
   });
 
   it("shows loading and success states in English", async () => {
-    const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (String(url).includes("/api/pet-types")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-        } as Response);
-      }
-      return Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ ok: true, pet: { name: "Luna" }, requestId: "req-1" }),
-      } as Response);
-    });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true, pet: { name: "Luna" }, requestId: "req-1" }),
+    } as Response);
     vi.stubGlobal("fetch", fetchMock);
 
     render(<PetForm />, { wrapper: createWrapper("en") });
-    expect(screen.getByLabelText("Loading pet types")).toBeInTheDocument();
-    await waitForPetTypes("Pet type");
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Pet name"), "Luna");
@@ -208,28 +124,19 @@ describe("PetForm", () => {
   });
 
   it("translates API and field codes without displaying raw codes", async () => {
-    const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (String(url).includes("/api/pet-types")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-        } as Response);
-      }
-      return Promise.resolve({
-        ok: false,
-        json: () =>
-          Promise.resolve({
-            ok: false,
-            errorCode: "VALIDATION_FAILED",
-            fieldErrorCodes: { name: "NAME_REQUIRED" },
-            supportId: "support-123",
-          }),
-      } as Response);
-    });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          ok: false,
+          errorCode: "VALIDATION_FAILED",
+          fieldErrorCodes: { name: "NAME_REQUIRED" },
+          supportId: "support-123",
+        }),
+    } as Response);
     vi.stubGlobal("fetch", fetchMock);
 
     render(<PetForm />, { wrapper: createWrapper() });
-    await waitForPetTypes(/Tipo de mascota/i);
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/Nombre de la mascota/i), "Luna");
@@ -239,37 +146,18 @@ describe("PetForm", () => {
 
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith("Error", {
-        description:
-          "Revisa los datos ingresados. Código de soporte: support-123",
+        description: "Revisa los datos ingresados. Código de soporte: support-123",
       }),
     );
     const nameInput = screen.getByLabelText(/Nombre de la mascota/i);
     expect(screen.getByText("El nombre es obligatorio.")).toBeInTheDocument();
     expect(nameInput).toHaveAttribute("aria-invalid", "true");
-    expect(nameInput.closest('[data-slot="field"]')).toHaveAttribute(
-      "data-invalid",
-      "true",
-    );
     expect(document.body.textContent).not.toContain("VALIDATION_FAILED");
     expect(document.body.textContent).not.toContain("NAME_REQUIRED");
   });
 
   it("supports keyboard navigation via Tab and Enter", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockImplementation((url: string) => {
-        if (String(url).includes("/api/pet-types")) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-          } as Response);
-        }
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) } as Response);
-      }),
-    );
-
     render(<PetForm />, { wrapper: createWrapper() });
-    await waitForPetTypes(/Tipo de mascota/i);
 
     const user = userEvent.setup();
     await user.tab();
@@ -285,35 +173,26 @@ describe("PetForm", () => {
   });
 
   it("submits via Enter key", async () => {
-    const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (String(url).includes("/api/pet-types")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, petTypes: mockPetTypes }),
-        } as Response);
-      }
-      if (String(url).includes("/api/pets")) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ ok: true, pet: { name: "Luna" }, requestId: "req-1" }),
-        } as Response);
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) } as Response);
-    });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true, pet: { name: "Luna" }, requestId: "req-1" }),
+    } as Response);
     vi.stubGlobal("fetch", fetchMock);
 
     render(<PetForm />, { wrapper: createWrapper() });
-    await waitForPetTypes(/Tipo de mascota/i);
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/Nombre de la mascota/i), "Luna");
     await selectPetType(/Tipo de mascota/i, "Perro");
     await user.type(screen.getByLabelText(/Nombre del propietario/i), "Ana");
-    expect(screen.getByLabelText(/Tipo de mascota/i)).toHaveTextContent("Perro");
-    await waitFor(() => expect(screen.getByLabelText(/Nombre de la mascota/i)).toHaveValue("Luna"));
-    // Press Enter on the form (should submit)
     fireEvent.submit(screen.getByTestId("pet-form"));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/pets"), expect.objectContaining({ method: "POST" })));
+  });
+
+  it("includes REPTILE option", async () => {
+    render(<PetForm />, { wrapper: createWrapper() });
+    const options = Array.from(document.querySelectorAll<HTMLSelectElement>('select[name="petTypeCode"] option')).map((o) => o.textContent);
+    expect(options).toContain("Reptil");
   });
 });

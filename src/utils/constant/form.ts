@@ -2,7 +2,7 @@ import type { CreatePetInput } from "@/interface";
 
 export const PET_FORM_DEFAULT_VALUES: CreatePetInput = {
   name: "",
-  petTypeId: "",
+  petTypeCode: "",
   age: undefined,
   ownerName: "",
 };

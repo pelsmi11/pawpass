@@ -6,21 +6,25 @@ vi.mock("@/db/queries", () => ({
 vi.mock("@/services/session", () => ({
   getOrCreateSessionId: vi.fn().mockResolvedValue("11111111-1111-4111-8111-111111111111"),
 }));
-vi.mock("@/utils/functions", () => ({
+vi.mock("@/utils/functions/requestContext", () => ({
   createRequestId: vi.fn().mockReturnValue("22222222-2222-4222-8222-222222222222"),
+  getDurationMs: vi.fn().mockReturnValue(5),
+}));
+
+vi.mock("@/utils/functions/logger", () => ({
+  log: vi.fn(),
+  logError: vi.fn(),
 }));
 
 import { GET } from "./route";
 import { listPetTypes } from "@/db/queries";
-import { createRequestId } from "@/utils/functions";
+import { createRequestId } from "@/utils/functions/requestContext";
 
 describe("GET /api/pet-types", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(createRequestId).mockReturnValue("22222222-2222-4222-8222-222222222222");
-  });
-
-  it("returns 200 with petTypes and requestId", async () => {
+  });  it("returns 200 with petTypes and requestId", async () => {
     const mockTypes = [
       { id: "a1b2c3d4-1111-4111-8111-111111111111", code: "CAT", title: "Gato" },
       { id: "a1b2c3d4-2222-4111-8111-111111111111", code: "DOG", title: "Perro" },

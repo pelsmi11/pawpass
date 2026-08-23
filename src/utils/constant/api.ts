@@ -5,6 +5,10 @@ export const API_ERROR_CODES = [
   "PET_TYPES_LOAD_FAILED",
   "PETS_LOAD_FAILED",
   "PET_CREATE_FAILED",
+  "LAB_DISABLED",
+  "INVALID_DEMO_TOKEN",
+  "INTERNAL_ERROR",
+  "SERVICE_UNAVAILABLE",
 ] as const satisfies readonly ApiErrorCode[];
 
 export const FIELD_ERROR_CODES = [
@@ -20,4 +24,4 @@ export const FIELD_ERROR_CODES = [
   "OWNER_NAME_TOO_LONG",
 ] as const satisfies readonly FieldErrorCode[];
 
-export const FORBIDDEN_PET_INPUT_KEYS = ["sessionId", "session_id"] as const;
+export const FORBIDDEN_PET_INPUT_KEYS = ["sessionId", "session_id", "petTypeId"] as const;

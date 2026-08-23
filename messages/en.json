@@ -13,9 +13,9 @@
     "skipToContent": "Skip to content",
     "home": "PawPass home",
     "main": "Main",
+    "register": "Register",
     "pets": "Pets",
-    "health": "Health",
-    "reminders": "Reminders",
+    "lab": "Lab",
     "register": "Register a pet"
   },
   "Hero": {
@@ -84,7 +84,8 @@
   },
   "PetTypes": {
     "DOG": "Dog",
-    "CAT": "Cat"
+    "CAT": "Cat",
+    "REPTILE": "Reptile"
   },
   "Errors": {
     "api": {
@@ -92,6 +93,10 @@
       "PET_TYPES_LOAD_FAILED": "We couldn't load the pet types.",
       "PETS_LOAD_FAILED": "We couldn't load the pets.",
       "PET_CREATE_FAILED": "We couldn't register your pet.",
+      "LAB_DISABLED": "The lab is disabled.",
+      "INVALID_DEMO_TOKEN": "Invalid demo token.",
+      "INTERNAL_ERROR": "Something went wrong. Try again.",
+      "SERVICE_UNAVAILABLE": "Service temporarily unavailable. Try again.",
       "UNKNOWN": "Something went wrong. Try again."
     },
     "field": {
@@ -106,6 +111,34 @@
       "OWNER_NAME_REQUIRED": "The owner name is required.",
       "OWNER_NAME_TOO_LONG": "The owner name can't exceed 100 characters."
     }
+  },
+  "Common": {
+    "accept": "Accept",
+    "cancel": "Cancel"
+  },
+  "DemoLab": {
+    "title": "Lab controls",
+    "description": "Trigger and reset controlled incidents for the demo. The panel is always visible; only writes require the demo token.",
+    "statusTitle": "Current status",
+    "databaseOutage": "Database outage",
+    "highLatency": "High latency",
+    "latencyMs": "Latency (ms)",
+    "tokenLabel": "Demo token",
+    "tokenPlaceholder": "Enter demo token",
+    "clear": "Clear",
+    "activate": "Activate outage",
+    "reset": "Reset lab",
+    "confirmOutageTitle": "Activate database outage?",
+    "confirmOutage": "The next registration will fail with 503 and a support code will be shown. You can restore normal operation with Reset.",
+    "confirmResetTitle": "Reset lab?",
+    "confirmReset": "This will clear outage state and restore normal registration.",
+    "loading": "Loading status...",
+    "error": "Could not load status",
+    "outageActive": "Outage active",
+    "outageInactive": "Normal",
+    "supportCode": "Support code: {code}",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "Footer": {
     "message": "© 2026 · Made with care for pets and their people."

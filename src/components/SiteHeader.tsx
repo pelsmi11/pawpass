@@ -1,3 +1,5 @@
+"use client";
+
 import { PawPrint } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -12,6 +14,13 @@ import { NAV_LINKS } from "@/utils/constant";
  */
 export const SiteHeader = () => {
   const t = useTranslations("Header");
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth" });
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
@@ -33,26 +42,35 @@ export const SiteHeader = () => {
           >
             <PawPrint className="size-5" />
           </span>
-          <span className="font-display text-lg tracking-tight text-foreground">
-            PawPass
-          </span>
+          <span className="font-display text-lg tracking-tight text-foreground">PawPass</span>
         </a>
 
         <nav aria-label={t("main")} className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((key) => (
-            <a
-              key={key}
-              href="#main-content"
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
-            >
-              {t(key)}
-            </a>
-          ))}
+          {NAV_LINKS.map((key) => {
+            const hrefMap: Record<string, string> = {
+              register: "#pet-form",
+              pets: "#pet-list",
+              lab: "#demo-lab",
+            };
+            return (
+              <a
+                key={key}
+                href={hrefMap[key] ?? "#main-content"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo((hrefMap[key] ?? "#main-content").slice(1));
+                }}
+                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
+              >
+                {t(key)}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2">
           <LocaleSwitcher />
-          <Button size="sm" className="shadow-soft">
+          <Button size="sm" className="shadow-soft" onClick={() => scrollTo("pet-form")}>
             {t("register")}
           </Button>
         </div>
