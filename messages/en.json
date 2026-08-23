@@ -1,0 +1,113 @@
+{
+  "Metadata": {
+    "title": "PawPass · Pet health registry",
+    "description": "A friendly, trustworthy registry for your companions — records, reminders and check-ins in one warm place."
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "switchTo": "Switch to {language}",
+    "en": "English",
+    "es": "Spanish"
+  },
+  "Header": {
+    "skipToContent": "Skip to content",
+    "home": "PawPass home",
+    "main": "Main",
+    "pets": "Pets",
+    "health": "Health",
+    "reminders": "Reminders",
+    "register": "Register a pet"
+  },
+  "Hero": {
+    "badge": "New · Digital pet passport",
+    "title": "Caring close to your pets",
+    "description": "A friendly and trustworthy registry for your companions. Keep records, reminders and health status together — warm and calm, never childish.",
+    "register": "Register a pet",
+    "viewPets": "View pets",
+    "verifiedRecords": "Verified vet records",
+    "careReminders": "Care reminders",
+    "trustedBySitters": "Trusted by sitters",
+    "goldenRetriever": "Golden retriever",
+    "profileAge": "{age, plural, one {# yr} other {# yrs}}",
+    "healthy": "Healthy",
+    "visits": "Visits",
+    "weight": "Weight",
+    "vaccines": "Vaccines",
+    "upToDate": "Up to date",
+    "nextCheckup": "Next checkup"
+  },
+  "StatusCard": {
+    "recentPets": "Recent pets",
+    "description": "Latest activity across your companions.",
+    "registered": "{count, plural, one {# registered} other {# registered}}",
+    "searchLabel": "Search pets",
+    "searchPlaceholder": "Search by name or microchip",
+    "petList": "Pet list",
+    "goldenRetriever": "Golden retriever",
+    "domesticShorthair": "Domestic shorthair",
+    "petDetail": "{breed} · {lastVisit}",
+    "lastVisitToday": "Last visit today",
+    "lastVisitDate": "Last visit {date}",
+    "healthy": "Healthy",
+    "dueSoon": "Due soon",
+    "vaccineReminder": "Vaccine reminder",
+    "reminder": "Milo's rabies booster is due {date}. Book a vet visit to stay up to date."
+  },
+  "PetForm": {
+    "title": "Register a pet",
+    "loadingTypes": "Loading pet types",
+    "loadErrorTitle": "Error",
+    "loadErrorDescription": "We couldn't load the pet types. Try again.",
+    "successTitle": "Success!",
+    "successMessage": "Pet registered! {name} now appears in the list.",
+    "errorTitle": "Error",
+    "supportCode": "Support code: {code}",
+    "nameLabel": "Pet name",
+    "namePlaceholder": "e.g. Luna",
+    "typeLabel": "Pet type",
+    "typePlaceholder": "Select a type",
+    "ageLabel": "Age (optional)",
+    "agePlaceholder": "e.g. 3",
+    "ownerLabel": "Owner name",
+    "ownerPlaceholder": "e.g. Ana",
+    "submitting": "Registering...",
+    "submit": "Register pet"
+  },
+  "PetList": {
+    "title": "Registered pets",
+    "errorTitle": "We couldn't load your pets",
+    "loadError": "We couldn't load the pets. Try again.",
+    "retry": "Try again",
+    "empty": "No pets have been registered yet. Be the first to register one!",
+    "listLabel": "Pet list",
+    "age": "{age, plural, one {# year} other {# years}}"
+  },
+  "PetTypes": {
+    "DOG": "Dog",
+    "CAT": "Cat"
+  },
+  "Errors": {
+    "api": {
+      "VALIDATION_FAILED": "Review the information you entered.",
+      "PET_TYPES_LOAD_FAILED": "We couldn't load the pet types.",
+      "PETS_LOAD_FAILED": "We couldn't load the pets.",
+      "PET_CREATE_FAILED": "We couldn't register your pet.",
+      "UNKNOWN": "Something went wrong. Try again."
+    },
+    "field": {
+      "INVALID_BODY": "The submitted data is invalid.",
+      "SESSION_FIELD_FORBIDDEN": "This field is not allowed.",
+      "NAME_REQUIRED": "The pet name is required.",
+      "NAME_TOO_LONG": "The pet name can't exceed 100 characters.",
+      "PET_TYPE_INVALID": "Select a valid pet type.",
+      "AGE_NOT_NUMBER": "Age must be a number.",
+      "AGE_NOT_INTEGER": "Age must be a whole number.",
+      "AGE_OUT_OF_RANGE": "Age must be between 0 and 100.",
+      "OWNER_NAME_REQUIRED": "The owner name is required.",
+      "OWNER_NAME_TOO_LONG": "The owner name can't exceed 100 characters."
+    }
+  },
+  "Footer": {
+    "message": "© 2026 · Made with care for pets and their people."
+  }
+}

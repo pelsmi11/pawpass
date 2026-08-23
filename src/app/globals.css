@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-nunito-sans);
+  --font-display: var(--font-varela-round);
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
@@ -26,8 +26,11 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
   --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
   --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
   --color-disabled: hsl(var(--disabled));
   --color-chart-1: hsl(var(--chart-1));
   --color-chart-2: hsl(var(--chart-2));
@@ -48,6 +51,12 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Soft UI Evolution: warm multi-layer shadows, stone-tinted (no hard lines) */
+@theme {
+  --shadow-soft: 0 1px 2px 0 rgb(28 25 23 / 0.05), 0 4px 16px -4px rgb(28 25 23 / 0.08);
+  --shadow-lifted: 0 2px 4px 0 rgb(28 25 23 / 0.06), 0 16px 40px -12px rgb(28 25 23 / 0.18);
+}
+
 :root {
   --radius: 0.625rem;
   --background: 35 33% 98%;
@@ -56,8 +65,9 @@
   --card-foreground: 20 14% 12%;
   --popover: 0 0% 100%;
   --popover-foreground: 20 14% 12%;
+  /* Dark ink on warm orange passes AA (~6.3:1); near-white failed at ~2.8:1 */
   --primary: 24 95% 53%;
-  --primary-foreground: 0 0% 98%;
+  --primary-foreground: 20 14% 12%;
   --secondary: 30 20% 94%;
   --secondary-foreground: 20 14% 12%;
   --muted: 30 10% 94%;
@@ -69,19 +79,22 @@
   --border: 30 12% 88%;
   --input: 30 12% 88%;
   --ring: 24 95% 53%;
-  --success: 142 71% 45%;
+  --success: 142 72% 30%;
+  --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
-  --info: 199 89% 48%;
+  --warning-foreground: 20 14% 12%;
+  --info: 200 98% 32%;
+  --info-foreground: 0 0% 100%;
   --disabled: 30 8% 85%;
   --chart-1: 24 95% 53%;
-  --chart-2: 142 71% 45%;
-  --chart-3: 199 89% 48%;
+  --chart-2: 142 72% 30%;
+  --chart-3: 200 98% 32%;
   --chart-4: 30 12% 88%;
   --chart-5: 25 5% 45%;
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 20 14% 12%;
   --sidebar-primary: 24 95% 53%;
-  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-primary-foreground: 20 14% 12%;
   --sidebar-accent: 30 20% 94%;
   --sidebar-accent-foreground: 20 14% 12%;
   --sidebar-border: 30 12% 88%;
@@ -108,19 +121,22 @@
   --border: 30 8% 18%;
   --input: 30 8% 18%;
   --ring: 24 94% 58%;
-  --success: 142 71% 45%;
-  --warning: 38 92% 50%;
-  --info: 199 89% 48%;
+  --success: 142 70% 29%;
+  --success-foreground: 0 0% 100%;
+  --warning: 43 96% 56%;
+  --warning-foreground: 20 14% 10%;
+  --info: 199 89% 62%;
+  --info-foreground: 20 14% 10%;
   --disabled: 30 8% 25%;
   --chart-1: 24 94% 58%;
-  --chart-2: 142 71% 45%;
-  --chart-3: 199 89% 48%;
+  --chart-2: 142 70% 29%;
+  --chart-3: 199 89% 62%;
   --chart-4: 30 8% 18%;
   --chart-5: 30 8% 65%;
   --sidebar: 20 14% 10%;
   --sidebar-foreground: 30 20% 96%;
   --sidebar-primary: 24 94% 58%;
-  --sidebar-primary-foreground: 30 20% 96%;
+  --sidebar-primary-foreground: 20 14% 8%;
   --sidebar-accent: 30 8% 18%;
   --sidebar-accent-foreground: 30 20% 96%;
   --sidebar-border: 30 8% 18%;
@@ -132,6 +148,16 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
