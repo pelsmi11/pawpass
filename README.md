@@ -73,6 +73,16 @@ gcloud run deploy pawpass \
 
 Las versiones de secretos son intencionalmente explícitas. Si se agrega una versión, revisa y actualiza el comando antes del siguiente despliegue.
 
+### Build automático desde GitHub
+
+Cada `push` a la rama `main` activa el trigger regional `pawpass-main-build`. Cloud Build ejecuta `cloudbuild.yaml`, construye `Dockerfile` y publica una imagen inmutable con el SHA completo del commit en:
+
+```text
+us-central1-docker.pkg.dev/pawpass-gdg-demo/pawpass/pawpass:COMMIT_SHA
+```
+
+Este trigger solo construye y almacena la imagen. No cambia automáticamente la revisión activa de Cloud Run.
+
 ## Estructura
 
 ```

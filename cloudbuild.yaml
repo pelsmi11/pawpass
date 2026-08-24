@@ -1,0 +1,20 @@
+steps:
+  - id: build-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --pull
+      - --tag
+      - ${_IMAGE}:${COMMIT_SHA}
+      - .
+
+images:
+  - ${_IMAGE}:${COMMIT_SHA}
+
+substitutions:
+  _IMAGE: us-central1-docker.pkg.dev/${PROJECT_ID}/pawpass/pawpass
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1200s
