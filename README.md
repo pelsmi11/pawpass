@@ -66,7 +66,7 @@ gcloud run deploy pawpass \
   --region=us-central1 \
   --service-account=pawpass-sa@pawpass-gdg-demo.iam.gserviceaccount.com \
   --set-build-env-vars='PNPM_CONFIG_IGNORE_SCRIPTS=true,DATABASE_URL=postgresql://user:password@127.0.0.1:5432/pawpass' \
-  --set-secrets=DATABASE_URL=pawpass-database-url:2,BROKEN_DATABASE_URL=pawpass-broken-database-url:1,DEMO_CONTROL_TOKEN=pawpass-demo-control-token:1 \
+  --set-secrets=DATABASE_URL=pawpass-database-url:2,BROKEN_DATABASE_URL=pawpass-broken-database-url:1,DEMO_CONTROL_TOKEN=pawpass-demo-control-token:2 \
   --set-env-vars=DEMO_LAB_ENABLED=true,SLOW_REQUEST_THRESHOLD_MS=2000 \
   --allow-unauthenticated
 ```
