@@ -4,7 +4,7 @@ Aplicación Next.js App Router para registro de mascotas. Parte del workspace `P
 
 ## Requisitos
 
-- Node.js `20.19.x LTS` (compatible con 22) — `node --version`
+- Node.js `22.x LTS` — `node --version`
 - pnpm `11.9.0` — `pnpm --version` (pin en `packageManager`)
 - Git
 - Neon PostgreSQL (para registro; tests usan mocks sin red)
@@ -54,6 +54,24 @@ No modifica `pnpm-lock.yaml`. Si falla por lock desactualizado, actualizar depen
 | `verify` | `pnpm lint && pnpm typecheck && pnpm test:coverage` | Gate Husky/CI (sin Neon, sin build) |
 | `verify:full` | `pnpm verify && pnpm build` | Gate final antes de PR/deploy (sin Neon) |
 | `prepare` | `node .husky/install.mjs` | Instala hooks Husky (omite en `CI=true` o `NODE_ENV=production`) |
+
+## Despliegue en Cloud Run
+
+El buildpack de Google Cloud instala varias versiones transitivas de `esbuild` con pnpm. Para evitar que sus scripts de instalación compartan el binario equivocado, el build remoto omite esos scripts; las dependencias binarias de plataforma ya están fijadas en `pnpm-lock.yaml`. `DATABASE_URL` durante el build es ficticia y no realiza conexiones. En runtime, Cloud Run reemplaza ese valor con la versión fija del secreto real.
+
+```bash
+gcloud run deploy pawpass \
+  --project=pawpass-gdg-demo \
+  --source=. \
+  --region=us-central1 \
+  --service-account=pawpass-sa@pawpass-gdg-demo.iam.gserviceaccount.com \
+  --set-build-env-vars='PNPM_CONFIG_IGNORE_SCRIPTS=true,DATABASE_URL=postgresql://user:password@127.0.0.1:5432/pawpass' \
+  --set-secrets=DATABASE_URL=pawpass-database-url:2,BROKEN_DATABASE_URL=pawpass-broken-database-url:1,DEMO_CONTROL_TOKEN=pawpass-demo-control-token:1 \
+  --set-env-vars=DEMO_LAB_ENABLED=true,SLOW_REQUEST_THRESHOLD_MS=2000 \
+  --allow-unauthenticated
+```
+
+Las versiones de secretos son intencionalmente explícitas. Si se agrega una versión, revisa y actualiza el comando antes del siguiente despliegue.
 
 ## Estructura
 

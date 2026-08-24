@@ -1,0 +1,14 @@
+.gcloudignore
+.git
+.gitignore
+.next
+coverage
+node_modules
+.env
+.env.*
+!.env.example
+.agents
+.claude
+.opencode
+skills-lock.json
+--help
